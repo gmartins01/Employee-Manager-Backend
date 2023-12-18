@@ -1,0 +1,31 @@
+version: "3.8"
+
+services:
+  db:
+    container_name: db
+    build:
+      context: ./db
+    ports:
+      - "${EXP_PORT_DB}:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+
+  app:
+    container_name: app
+    build:
+      context: ./app
+    ports:
+      - "${EXT_PORT_BACKEND}:${EXT_PORT_BACKEND}"
+    volumes:
+      - ./app:/app
+    depends_on:
+      - db
+    environment:
+      SERVER_PORT: "${EXT_PORT_BACKEND}"
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:${EXP_PORT_DB}/employee-manager
+      SPRING_DATASOURCE_USERNAME: "${DB_USER}"
+      SPRING_DATASOURCE_PASSWORD: "${DB_PASSWORD}"
+
+
+volumes:
+  db-data:
